@@ -15,3 +15,13 @@ export const getPopularMovies=async()=>{
     console.log(response.data);
     return response.data.results;
 }
+
+export const getGenres=async()=>{
+    const response=await axios.get(`${BASE_URL}/genre/movie/list`,options);
+    console.log(response.data);
+    return response.data.genres;
+}
+
+export const getSortBy=async()=>{
+    
+}
