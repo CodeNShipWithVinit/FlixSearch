@@ -130,7 +130,6 @@ function App() {
             {movie.title}
           </h3>
         ))}
-        console.log("Debugging");
       </div>
     </div>
   );
