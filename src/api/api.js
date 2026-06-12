@@ -9,38 +9,38 @@ export const options={
     },
 };
 
-export const getPopularMovies=async()=>{
-
-    const response=await axios.get(`${BASE_URL}/movie/popular`,options);
-    console.log(response.data);
-    return response.data.results;
-}
-
 export const getGenres=async()=>{
     const response=await axios.get(`${BASE_URL}/genre/movie/list`,options);
-    console.log(response.data);
     return response.data.genres;
 }
 
-export const getSortBy=async(sortBy)=>{
+export const Loadmovies=async(genreId,sortBy)=>{
     const response=await axios.get(`${BASE_URL}/discover/movie`,
         {
             ...options,
             params:{
+            with_genres:genreId,
             sort_by:sortBy
             }
         }
     )
+    console.log(response.data);
     return response.data.results;
 }
 
-export const getMoviesByGenre=async(genreId)=>{
-    const response=await axios.get(`${BASE_URL}/discover/movie`,
-    {
-        ...options,
-        params:{
-            with_genres:genreId
-        }
-    })
+export const searchMovies=async(searchTerm)=>{
+
+    if (!searchTerm.trim()) {
+        return;
+    }
+    const response=await axios.get(`${BASE_URL}/search/movie`,
+          {
+            ...options,
+            params:{
+              query:searchTerm
+            }
+          }
+        )
     return response.data.results;
 }
+
