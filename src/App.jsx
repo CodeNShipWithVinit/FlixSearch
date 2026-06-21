@@ -122,7 +122,6 @@ function App() {
             <MovieCard key={movie.id} details={movie}/>
           ))}
       </div>
-        console.log("Debugging");
     </div>
   );
 }
