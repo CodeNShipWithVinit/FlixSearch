@@ -1,7 +1,7 @@
 
 const MovieCard = ({details}) => {
   return (
-    <div className="bg-white/5 shadow-lg backdrop-blur-md border border-white/10 rounded-md flex flex-col text-center overflow-hidden gap-10">
+    <div className="bg-white/5 shadow-lg backdrop-blur-md border border-white/10 rounded-md flex flex-col text-center overflow-hidden gap-10 m-1">
         <div className="aspect-2/3 shrink-0">
             <img src={`https://image.tmdb.org/t/p/w500${details.poster_path}`} alt={details.title}  className="w-full h-full object-cover"/>
         </div>

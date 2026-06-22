@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
 import logo from "./assets/logo.png";
-import { getGenres, Loadmovies, searchMovies} from "./api/api";
+import { getGenres, Loadmovies, searchMovies } from "./api/api";
 import { Sort_Options } from "./constants/SortOptions";
 import MovieCard from "./components/MovieCard";
+import Pagination from "./components/Pagination";
 
 function App() {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [sortBy,setSortBy]=useState("popularity.desc");
-  const [searchQuery,setSearchQuery]=useState("");
+  const [sortBy, setSortBy] = useState("popularity.desc");
+  const [searchQuery, setSearchQuery] = useState("");
   const [genreId,setGenreId]=useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const moviesPerPage = 5;
 
   useEffect(() => {
     const loadGenres = async () => {
@@ -23,13 +27,17 @@ function App() {
     loadGenres();
   }, []);
 
-   useEffect(() => {
-
-    if (!genreId) return;
-
+  useEffect(() => {
     const loadMovies = async () => {
       try {
-        const data = await Loadmovies(genreId,sortBy);
+        let data;
+        if (genreId === "") {
+          // Load all movies (e.g., by sort)
+          data = await Loadmovies("", sortBy);
+        } else {
+          // Load movies for the selected genre
+          data = await Loadmovies(genreId, sortBy);
+        }
         setMovies(data);
       } catch (error) {
         console.error("Failed to load movies", error);
@@ -37,13 +45,22 @@ function App() {
     };
 
     loadMovies();
-  }, [genreId,sortBy]);
+  }, [genreId, sortBy]);
 
-
-  const handleSearch=async(searchTerm)=>{
-    const data=await searchMovies(searchTerm);
+  const handleSearch = async (searchTerm) => {
+    setCurrentPage(1);
+    if(searchTerm.trim()==="")
+    {
+      return;
+    }
+    const data = await searchMovies(searchTerm);
     setMovies(data);
-  }
+  };
+
+  const indexOfLastMovie = currentPage * moviesPerPage;
+  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+
+  const currentMovies = movies.slice(indexOfFirstMovie, indexOfLastMovie);
 
   return (
     <div className="min-h-screen bg-gray-950 bg-linear-to-br from-gray-950 via-slate-900 to-indigo-950 text-white">
@@ -57,16 +74,16 @@ function App() {
               className="bg-white w-full rounded-md px-4 py-2 text-black caret-red-500"
               type="text"
               value={searchQuery}
-              onChange={(e)=>setSearchQuery(e.target.value)}
-              onKeyDown={(e)=>{
-                if(e.key==="Enter")
-                {
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
                   handleSearch(searchQuery);
                 }
               }}
             />
-            <button className="bg-red-600 hover:bg-red-700 px-3 rounded-md active:scale-95"
-              onClick={()=>handleSearch(searchQuery)}
+            <button
+              className="bg-red-600 hover:bg-red-700 px-3 rounded-md active:scale-95"
+              onClick={() => handleSearch(searchQuery)}
             >
               Search
             </button>
@@ -82,11 +99,16 @@ function App() {
             <select
               className="bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={sortBy}
-              onChange={(e)=>setSortBy(e.target.value)}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setCurrentPage(1);
+              }}
               id="sort"
             >
-              {Sort_Options.map((option)=>(
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {Sort_Options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
@@ -100,10 +122,13 @@ function App() {
             </label>
             <select
               className="bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e)=>setGenreId(e.target.value)}
+              onChange={(e) => {
+                setGenreId(e.target.value);
+                setCurrentPage(1);
+              }}
               id="genre"
             >
-              <option value="" value="All genres">All Genres</option>
+              <option value="">All Genres</option>
               {genres.map((genre) => (
                 <option key={genre.id} value={genre.id}>
                   {genre.name}
@@ -113,15 +138,23 @@ function App() {
           </div>
         </div>
       </header>
-      <div className="w-full grid grid-cols-1
+      <div
+        className="w-full grid grid-cols-1
   sm:grid-cols-2
   md:grid-cols-3
   lg:grid-cols-5
-  gap-4 p-3">
-          {movies.map((movie) => (
-            <MovieCard key={movie.id} details={movie}/>
-          ))}
+  gap-4 p-3"
+      >
+        {currentMovies.map((movie) => (
+          <MovieCard key={movie.id} details={movie} />
+        ))}
       </div>
+      <Pagination
+        totalMovies={movies.length}
+        moviesAPage={moviesPerPage}
+        currentPage={currentPage}
+        setCurrentPageNo={setCurrentPage}
+      />
     </div>
   );
 }
