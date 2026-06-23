@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import logo from "./assets/logo.png";
 import { getGenres, Loadmovies, searchMovies } from "./api/api";
-import { Sort_Options } from "./constants/SortOptions";
+import { Sort_Options } from "./constants/sortOptions";
 import MovieCard from "./components/MovieCard";
 import Pagination from "./components/Pagination";
 
