@@ -10,6 +10,7 @@ const MovieCard = ({details}) => {
             <h1 className="text-xl font-bold">{details.title}</h1>
             <p className="line-clamp-3 text-gray-400">{details.overview}</p>
         </div>
+        console.log("Debugging");
     </div>
   )
 }
